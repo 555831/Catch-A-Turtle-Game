@@ -4,13 +4,19 @@ import turtle as trtl
 
 import random as rand
 
-
+import leaderboard as lb
 
 
 
 
 #-----game configuration----
 wn = trtl.Screen()
+
+#leaderboard variables
+leaderboard_file_name = "a122_leaderboard.txt"
+leader_names_list = []
+leader_scores_list = []
+player_name = input("Please enter your name: ")
 
 #spot variables
 spot_size = 2
@@ -59,8 +65,6 @@ def change_size():
   new_size = rand.choice(size)
   spot.shapesize(new_size)
 
-  
-
 def update_score():
   global score
   score = score + 1
@@ -74,13 +78,13 @@ def change_position():
   spot.goto(new_xpos,new_ypos)
   spot.showturtle()
 
-
 def countdown():
   global timer, timer_up
   count.clear()
   if timer <= 0:
     count.write("Time's Up", font=font_setup)
     timer_up = True
+    manage_leaderboard()
   else:
     count.write("Timer: " + str(timer), font =font_setup)
     timer -= 1
@@ -96,6 +100,25 @@ def spot_clicked(x,y):
     change_position()
   else:
     spot.hideturtle()
+
+# manages the leaderboard for top 5 scorers
+def manage_leaderboard():
+  
+  global leader_scores_list
+  global leader_names_list
+  global score
+  global spot
+
+  # load all the leaderboard records into the lists
+  lb.load_leaderboard(leaderboard_file_name, leader_names_list, leader_scores_list)
+
+  if (len(leader_scores_list) < 5 or score > leader_scores_list[4]):
+    lb.update_leaderboard(leaderboard_file_name, leader_names_list, leader_scores_list, player_name, score)
+    lb.draw_leaderboard(leader_names_list, leader_scores_list, True, spot, score)
+
+  else:
+    lb.draw_leaderboard(leader_names_list, leader_scores_list, False, spot, score)
+
 
 
 #-----events----------------
